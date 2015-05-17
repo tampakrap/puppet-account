@@ -1,0 +1,42 @@
+{
+  "name": "tampakrap-account",
+  "version": "0.1.0",
+  "author": ["Theo Chatzimichos", "Vikraman Choudhury"],
+  "license": "Apache-2.0",
+  "summary": "TODO",
+  "source": "https://github.com/tampakrap/puppet-account",
+  "project_page": "https://github.com/tampakrap/puppet-account",
+  "issues_url": "https://github.com/tampakrap/puppet-account/issues",
+  "tags": ["user", "group"],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [ "7.8" ]
+    },
+    {
+      "operatingsystem": "Gentoo"
+    },
+    {
+      "operatingsystem": "openSUSE",
+      "operatingsystemrelease": [ "13.2" ]
+    },
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [ "6.0" ]
+    },
+    {
+      "operatingsystem": "SLES",
+      "operatingsystemrelease": [ "12" ]
+    },
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [ "14.10" ]
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": "3.x"
+    }
+  ]
+}
