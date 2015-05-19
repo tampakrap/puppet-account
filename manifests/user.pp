@@ -1,10 +1,12 @@
 # == Defined type: account::user
 #
-# Wrapper around the user resource, that also handles:
+# Wrapper around the user resource and various other modules, in order to
+# handle a user plus various of his dotfiles. More specifically, it handles:
 #  - ~/.ssh/authorized_keys through ssh_authorized_keys resource
 #  - ~/.ssh/known_hosts through sshkey resource
 #  - ~/.ssh/config through sshuserconfig::remotehost
 #  - ~/.git/config through git::config (puppetlabs/git)
+#  - ~/.gnupg through through gnupg_key (golja/gnupg)
 #  - ~/.forward
 #
 define account::user (
@@ -21,6 +23,7 @@ define account::user (
   $ssh_known_hosts     = {},
   $ssh_config          = {},
   $git_config          = {},
+  $gpg_keys            = {},
   $forward             = undef,
 ) {
   validate_re($ensure, ['present', 'absent'])
@@ -105,6 +108,18 @@ define account::user (
       create_resources(git::config, $git_config, $defaults)
     } else {
       file { "/home/${name}/.gitconfig": ensure => 'absent' }
+    }
+
+    if $gpg_keys {
+      include gnupg
+
+      $defaults = {
+        'ensure'     => 'present',
+        'user'       => $name,
+        'key_source' => 'hkp://keys.gnupg.net/',
+        'key_type'   => 'public',
+      }
+      create_resources(gnupg_key, $gpg_keys, $defaults)
     }
   }
 }
