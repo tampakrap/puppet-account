@@ -38,6 +38,9 @@
       "name": "puppetlabs/git"
     },
     {
+      "name": "puppetlabs/stdlib"
+    },
+    {
       "name": "golja/gnupg"
     }
   ],
