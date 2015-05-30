@@ -26,6 +26,7 @@ describe 'account::user' do
         :uid      => '1000',
         :gid      => '100',
         :password => 'p4ssw0rd',
+        :shell    => '/bin/bash',
       }
     end
 
@@ -39,6 +40,7 @@ describe 'account::user' do
       :purge_ssh_keys => true,
       :system         => false,
       :home           => "/home/#{title}",
+      :shell          => '/bin/bash',
     ) end
 
     it do should contain_file("/home/#{title}/.ssh").with(
@@ -124,6 +126,7 @@ describe 'account::user' do
         :remote_hostname => 'github.com',
         :remote_username => 'git',
         :unix_user       => title,
+        :ssh_config_dir  => "/home/#{title}/.ssh",
       ).that_requires(["User[#{title}]", "File[/home/#{title}/.ssh]"]) end
     end
 
@@ -161,9 +164,28 @@ describe 'account::user' do
       it do should contain_gnupg_key('myuser_pubkey').with(
         :key_id     => 'AAAAAAAA',
         :user       => title,
-        :key_server => 'hkp://keys.gnupg.net/',
         :key_type   => 'public',
       ).that_requires(["User[#{title}]"]) end
+    end
+
+    context 'when specifying home directory' do
+      let(:params) do
+        {
+          :ensure => 'present',
+          :home   => "/var/lib/#{title}",
+          :forward => 'user@example.com',
+          :ssh_known_hosts => {
+            'host1' => {
+              'key' => 'long_string'
+            }
+          }
+        }
+      end
+
+      it { should contain_user(title).with_home("/var/lib/#{title}") }
+      it { should contain_file("/var/lib/#{title}/.ssh") }
+      it { should contain_file("/var/lib/#{title}/.forward") }
+      it { should contain_sshkey('host1').with_target("/var/lib/#{title}/.ssh/known_hosts") }
     end
   end
 end
