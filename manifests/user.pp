@@ -29,6 +29,10 @@ define account::user (
   $home_mode           = '0755',
 ) {
   validate_re($ensure, ['present', 'absent'])
+  validate_array($groups)
+  validate_bool($managehome)
+  validate_bool($purge_ssh_keys)
+  validate_bool($system)
   validate_hash($ssh_authorized_keys)
   validate_hash($ssh_known_hosts)
   validate_hash($ssh_config)

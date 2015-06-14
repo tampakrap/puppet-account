@@ -5,7 +5,7 @@ describe 'account::user' do
   it { should compile.with_all_deps }
   let(:facts) do
     {
-      :osfamily => 'SUSE',
+      :osfamily        => 'SUSE',
       :operatingsystem => 'openSUSE',
     }
   end
@@ -24,7 +24,7 @@ describe 'account::user' do
       let(:params) do
         {
           :ensure     => 'present',
-          :managehome => 'false',
+          :managehome => false,
         }
       end
 
@@ -218,7 +218,7 @@ describe 'account::user' do
         end
 
         it { should contain_user(title).with_home("/var/lib/#{title}") }
-        it { should contain_file("/var/lib/#{title}").with_home_mode('0750') }
+        it { should contain_file("/var/lib/#{title}").with_mode('0750') }
         it { should contain_file("/var/lib/#{title}/.ssh") }
         it { should contain_file("/var/lib/#{title}/.forward") }
         it { should contain_sshkey('host1').with_target("/var/lib/#{title}/.ssh/known_hosts") }
