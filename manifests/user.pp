@@ -4,7 +4,7 @@
 # handle a user plus various of his dotfiles. More specifically, it handles:
 #  - ~/.ssh/authorized_keys through ssh_authorized_keys resource
 #  - ~/.ssh/known_hosts through sshkey resource
-#  - ~/.ssh/config through sshuserconfig::remotehost
+#  - ~/.ssh/config through ssh::client::config::user (saz/ssh)
 #  - ~/.git/config through git::config (puppetlabs/git)
 #  - ~/.gnupg through through gnupg_key (golja/gnupg)
 #  - ~/.forward
@@ -85,7 +85,7 @@ define account::user (
     if ! empty($ssh_authorized_keys) {
       $ssh_auth_keys_defaults = {
         'user'    => $name,
-        'require' => File[$home],
+        'require' => File["${home}/.ssh"],
       }
       create_resources(ssh_authorized_key, $ssh_authorized_keys, $ssh_auth_keys_defaults)
     }
@@ -93,18 +93,18 @@ define account::user (
     if ! empty($ssh_known_hosts) {
       $ssh_known_hosts_defaults = {
         'target'  => "${home}/.ssh/known_hosts",
-        'require' => File[$home],
+        'require' => File["${home}/.ssh"],
       }
       create_resources(sshkey, $ssh_known_hosts, $ssh_known_hosts_defaults)
     }
 
     if ! empty($ssh_config) {
-      $ssh_config_defaults = {
-        'unix_user'      => $name,
-        'ssh_config_dir' => "${home}/.ssh",
-        'require'        => File[$home],
+      ssh::client::config::user { $name:
+        user_home_dir       => $home,
+        manage_user_ssh_dir => false,
+        options             => $ssh_config,
+        require             => File["${home}/.ssh"],
       }
-      create_resources(sshuserconfig::remotehost, $ssh_config, $ssh_config_defaults)
     } else {
       file { "${home}/.ssh/config": ensure => 'absent' }
     }

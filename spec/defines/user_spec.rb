@@ -111,7 +111,7 @@ describe 'account::user' do
         it do should contain_ssh_authorized_key('key1').with(
           :type => 'ssh-rsa',
           :user => title,
-        ).that_requires("File[/home/#{title}]") end
+        ).that_requires("File[/home/#{title}/.ssh]") end
         it { should contain_ssh_authorized_key('key2').with_key('long_string') }
       end
 
@@ -130,7 +130,7 @@ describe 'account::user' do
         it do should contain_sshkey('host1').with(
           :key    => 'long_string',
           :target => "/home/#{title}/.ssh/known_hosts",
-        ).that_requires("File[/home/#{title}]") end
+        ).that_requires("File[/home/#{title}/.ssh]") end
       end
 
       context 'when specifying ssh_config' do
@@ -138,22 +138,22 @@ describe 'account::user' do
           {
             :ensure     => 'present',
             :ssh_config => {
-              'random_github_prj' => {
-                'remote_hostname'     => 'github.com',
-                'remote_username'     => 'git',
-                'private_key_content' => 'long_prv_string',
-                'public_key_content'  => 'long_pub_string',
+              'Host github.com' => {
+                'User' => 'git',
               }
             }
           }
         end
 
-        it do should contain_sshuserconfig__remotehost('random_github_prj').with(
-          :remote_hostname => 'github.com',
-          :remote_username => 'git',
-          :unix_user       => title,
-          :ssh_config_dir  => "/home/#{title}/.ssh",
-        ).that_requires("File[/home/#{title}]") end
+        it do should contain_ssh__client__config__user(title).with(
+          :user_home_dir       => "/home/#{title}",
+          :manage_user_ssh_dir => false,
+          :options             => {
+            'Host github.com' => {
+              'User' => 'git',
+            }
+          }
+        ).that_requires("File[/home/#{title}/.ssh]") end
       end
 
       context 'when specifying git_config' do
@@ -207,11 +207,8 @@ describe 'account::user' do
               }
             },
             :ssh_config      => {
-              'random_github_prj' => {
-                'remote_hostname'     => 'github.com',
-                'remote_username'     => 'git',
-                'private_key_content' => 'long_prv_string',
-                'public_key_content'  => 'long_pub_string',
+              'Hostname github.com' => {
+                'User' => 'git',
               }
             }
           }
@@ -222,7 +219,7 @@ describe 'account::user' do
         it { should contain_file("/var/lib/#{title}/.ssh") }
         it { should contain_file("/var/lib/#{title}/.forward") }
         it { should contain_sshkey('host1').with_target("/var/lib/#{title}/.ssh/known_hosts") }
-        it { should contain_sshuserconfig__remotehost('key1').with_ssh_config_dir("/var/lib/#{title}/.ssh") }
+        it { should contain_ssh__client__config__user(title).with_user_home_dir("/var/lib/#{title}") }
       end
     end
   end

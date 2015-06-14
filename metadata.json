@@ -42,6 +42,9 @@
     },
     {
       "name": "golja/gnupg"
+    },
+    {
+      "name": "saz/ssh"
     }
   ],
   "requirements": [

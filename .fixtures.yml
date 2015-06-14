@@ -1,10 +1,9 @@
 fixtures:
   forge_modules:
-    concat: "puppetlabs/concat"
     git: "puppetlabs/git"
+    ssh: "saz/ssh"
     stdlib: "puppetlabs/stdlib"
   repositories:
     gnupg: "git://github.com/tampakrap/golja-gnupg"
-    sshuserconfig: "git://github.com/Jimdo/puppet-sshuserconfig"
   symlinks:
     account: "#{source_dir}"
