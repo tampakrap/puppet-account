@@ -26,6 +26,7 @@ define account::user (
   $git_config          = {},
   $gpg_keys            = {},
   $forward             = undef,
+  $home_mode           = '0755',
 ) {
   validate_re($ensure, ['present', 'absent'])
   validate_hash($ssh_authorized_keys)
@@ -48,13 +49,21 @@ define account::user (
     shell          => $shell,
   }
 
-  if $ensure == 'present' {
+  if $ensure == 'present' and $managehome {
+    file { $home:
+      ensure  => 'directory',
+      owner   => $name,
+      group   => $gid,
+      mode    => $home_mode,
+      require => User[$name],
+    }
+
     file { "${home}/.ssh":
       ensure  => 'directory',
       owner   => $name,
       group   => $gid,
       mode    => '0600',
-      require => User[$name],
+      require => File[$home],
     }
 
     if $forward {
@@ -63,7 +72,7 @@ define account::user (
         owner   => $name,
         group   => $gid,
         mode    => '0644',
-        require => User[$name],
+        require => File[$home],
       }
     } else {
       file { "${home}/.forward": ensure => 'absent' }
@@ -72,10 +81,7 @@ define account::user (
     if ! empty($ssh_authorized_keys) {
       $ssh_auth_keys_defaults = {
         'user'    => $name,
-        'require' => [
-          User[$name],
-          File["${home}/.ssh"]
-        ],
+        'require' => File[$home],
       }
       create_resources(ssh_authorized_key, $ssh_authorized_keys, $ssh_auth_keys_defaults)
     }
@@ -83,10 +89,7 @@ define account::user (
     if ! empty($ssh_known_hosts) {
       $ssh_known_hosts_defaults = {
         'target'  => "${home}/.ssh/known_hosts",
-        'require' => [
-          User[$name],
-          File["${home}/.ssh"]
-        ],
+        'require' => File[$home],
       }
       create_resources(sshkey, $ssh_known_hosts, $ssh_known_hosts_defaults)
     }
@@ -95,10 +98,7 @@ define account::user (
       $ssh_config_defaults = {
         'unix_user'      => $name,
         'ssh_config_dir' => "${home}/.ssh",
-        'require'        => [
-          User[$name],
-          File["${home}/.ssh"]
-        ],
+        'require'        => File[$home],
       }
       create_resources(sshuserconfig::remotehost, $ssh_config, $ssh_config_defaults)
     } else {
@@ -108,7 +108,7 @@ define account::user (
     if ! empty($git_config) {
       $git_config_defaults = {
         'user'    => $name,
-        'require' => User[$name],
+        'require' => File[$home],
       }
       create_resources(git::config, $git_config, $git_config_defaults)
     } else {
@@ -121,7 +121,7 @@ define account::user (
       $gpg_keys_defaults = {
         'user'       => $name,
         'key_type'   => 'public',
-        'require'    => User[$name],
+        'require'    => File[$home],
       }
       create_resources(gnupg_key, $gpg_keys, $gpg_keys_defaults)
     }
