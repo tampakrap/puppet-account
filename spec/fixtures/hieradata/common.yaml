@@ -1,0 +1,15 @@
+---
+account::groups:
+  mygrp:
+    gid: '50'
+    system: true
+  myothergrp:
+    gid: '200'
+    system: false
+account::users:
+  myuser:
+    uid: '50'
+    system: true
+  myotheruser:
+    uid: '200'
+    system: false

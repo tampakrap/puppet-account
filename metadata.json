@@ -38,7 +38,13 @@
       "name": "puppetlabs/git"
     },
     {
+      "name": "puppetlabs/stdlib"
+    },
+    {
       "name": "golja/gnupg"
+    },
+    {
+      "name": "saz/ssh"
     }
   ],
   "requirements": [

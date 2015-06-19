@@ -4,7 +4,7 @@
 # handle a user plus various of his dotfiles. More specifically, it handles:
 #  - ~/.ssh/authorized_keys through ssh_authorized_keys resource
 #  - ~/.ssh/known_hosts through sshkey resource
-#  - ~/.ssh/config through sshuserconfig::remotehost
+#  - ~/.ssh/config through ssh::client::config::user (saz/ssh)
 #  - ~/.git/config through git::config (puppetlabs/git)
 #  - ~/.gnupg through through gnupg_key (golja/gnupg)
 #  - ~/.forward
@@ -15,6 +15,7 @@ define account::user (
   $managehome          = true,
   $purge_ssh_keys      = true,
   $system              = false,
+  $shell               = undef,
   $home                = "/home/${name}",
   $uid                 = undef,
   $gid                 = undef,
@@ -25,12 +26,19 @@ define account::user (
   $git_config          = {},
   $gpg_keys            = {},
   $forward             = undef,
+  $home_mode           = '0755',
 ) {
   validate_re($ensure, ['present', 'absent'])
+  validate_array($groups)
+  validate_bool($managehome)
+  validate_bool($purge_ssh_keys)
+  validate_bool($system)
   validate_hash($ssh_authorized_keys)
   validate_hash($ssh_known_hosts)
   validate_hash($ssh_config)
   validate_hash($git_config)
+  validate_hash($gpg_keys)
+  validate_string($forward)
 
   user { $name:
     ensure         => $ensure,
@@ -42,84 +50,84 @@ define account::user (
     password       => $password,
     purge_ssh_keys => $purge_ssh_keys,
     system         => $system,
+    shell          => $shell,
   }
 
-  if $ensure == 'present' {
-    file { "/home/${name}/.ssh":
+  if $ensure == 'present' and $managehome {
+    file { $home:
+      ensure  => 'directory',
+      owner   => $name,
+      group   => $gid,
+      mode    => $home_mode,
+      require => User[$name],
+    }
+
+    file { "${home}/.ssh":
       ensure  => 'directory',
       owner   => $name,
       group   => $gid,
       mode    => '0600',
-      require => User[$name],
+      require => File[$home],
     }
 
     if $forward {
-      file { "/home/${name}/.forward":
+      file { "${home}/.forward":
         content => "# managed by puppet\n\n${forward}\n",
         owner   => $name,
         group   => $gid,
         mode    => '0644',
-        require => User[$name],
+        require => File[$home],
       }
     } else {
-      file { "/home/${name}/.forward": ensure => 'absent' }
+      file { "${home}/.forward": ensure => 'absent' }
     }
 
-    if $ssh_authorized_keys {
-      $defaults = {
+    if ! empty($ssh_authorized_keys) {
+      $ssh_auth_keys_defaults = {
         'user'    => $name,
-        'require' => [
-          User[$name],
-          File["${name}/.ssh"]
-        ],
+        'require' => File["${home}/.ssh"],
       }
-      create_resources(ssh_authorized_key, $ssh_authorized_keys, $defaults)
+      create_resources(ssh_authorized_key, $ssh_authorized_keys, $ssh_auth_keys_defaults)
     }
 
-    if $ssh_known_hosts {
-      $defaults = {
-        'target'  => "/home/${name}/.ssh/known_hosts",
-        'require' => [
-          User[$name],
-          File["${name}/.ssh"]
-        ],
+    if ! empty($ssh_known_hosts) {
+      $ssh_known_hosts_defaults = {
+        'target'  => "${home}/.ssh/known_hosts",
+        'require' => File["${home}/.ssh"],
       }
-      create_resources(sshkey, $ssh_known_hosts, $defaults)
+      create_resources(sshkey, $ssh_known_hosts, $ssh_known_hosts_defaults)
     }
 
-    if $ssh_config {
-      $defaults = {
-        'unix_user' => $name,
-        'require'   => [
-          User[$name],
-          File["${name}/.ssh"]
-        ],
+    if ! empty($ssh_config) {
+      ssh::client::config::user { $name:
+        user_home_dir       => $home,
+        manage_user_ssh_dir => false,
+        options             => $ssh_config,
+        require             => File["${home}/.ssh"],
       }
-      create_resources(sshuserconfig::remotehost, $ssh_config, $defaults)
     } else {
-      file { "/home/${name}/.ssh/config": ensure => 'absent' }
+      file { "${home}/.ssh/config": ensure => 'absent' }
     }
 
-    if $git_config {
-      $defaults = {
+    if ! empty($git_config) {
+      $git_config_defaults = {
         'user'    => $name,
-        'require' => User[$name],
+        'require' => File[$home],
       }
-      create_resources(git::config, $git_config, $defaults)
+      create_resources(git::config, $git_config, $git_config_defaults)
     } else {
-      file { "/home/${name}/.gitconfig": ensure => 'absent' }
+      file { "${home}/.gitconfig": ensure => 'absent' }
     }
 
-    if $gpg_keys {
+    if ! empty($gpg_keys) {
       include gnupg
 
-      $defaults = {
-        'ensure'     => 'present',
+      $gpg_keys_defaults = {
         'user'       => $name,
-        'key_source' => 'hkp://keys.gnupg.net/',
         'key_type'   => 'public',
+        'require'    => File[$home],
       }
-      create_resources(gnupg_key, $gpg_keys, $defaults)
+      create_resources(gnupg_key, $gpg_keys, $gpg_keys_defaults)
     }
   }
 }

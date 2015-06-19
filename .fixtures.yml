@@ -1,0 +1,9 @@
+fixtures:
+  forge_modules:
+    git: "puppetlabs/git"
+    ssh: "saz/ssh"
+    stdlib: "puppetlabs/stdlib"
+  repositories:
+    gnupg: "git://github.com/tampakrap/golja-gnupg"
+  symlinks:
+    account: "#{source_dir}"
