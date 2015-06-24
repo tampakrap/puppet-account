@@ -21,6 +21,7 @@ define account::user (
   $gid                 = undef,
   $password            = undef,
   $ssh_authorized_keys = {},
+  $ssh_keys            = {},
   $ssh_known_hosts     = {},
   $ssh_config          = {},
   $git_config          = {},
@@ -34,6 +35,7 @@ define account::user (
   validate_bool($purge_ssh_keys)
   validate_bool($system)
   validate_hash($ssh_authorized_keys)
+  validate_hash($ssh_keys)
   validate_hash($ssh_known_hosts)
   validate_hash($ssh_config)
   validate_hash($git_config)
@@ -88,6 +90,13 @@ define account::user (
         'require' => File["${home}/.ssh"],
       }
       create_resources(ssh_authorized_key, $ssh_authorized_keys, $ssh_auth_keys_defaults)
+    }
+
+    if !empty($ssh_keys) {
+      $ssh_keys_defaults = {
+        'home' => $home,
+      }
+      create_resources(ssh_keygen, $ssh_keys, $ssh_keys_defaults)
     }
 
     if ! empty($ssh_known_hosts) {
