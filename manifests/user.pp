@@ -14,6 +14,7 @@ define account::user (
   $managehome          = true,
   $purge_ssh_keys      = true,
   $system              = false,
+  $shell               = undef,
   $home                = "/home/${name}",
   $uid                 = undef,
   $gid                 = undef,
@@ -45,6 +46,7 @@ define account::user (
     password       => $password,
     purge_ssh_keys => $purge_ssh_keys,
     system         => $system,
+    shell          => $shell,
   }
 
   if $ensure == 'present' {
