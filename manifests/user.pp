@@ -4,7 +4,7 @@
 # handle a user plus various of his dotfiles. More specifically, it handles:
 #  - ~/.ssh/authorized_keys through ssh_authorized_keys resource
 #  - ~/.ssh/known_hosts through sshkey resource
-#  - ~/.ssh/config through sshuserconfig::remotehost
+#  - ~/.ssh/config through ssh::client::config::user (saz/ssh)
 #  - ~/.git/config through git::config (puppetlabs/git)
 #  - ~/.gnupg through through gnupg_key (golja/gnupg)
 #
@@ -84,11 +84,12 @@ define account::user (
     }
 
     if ! empty($ssh_config) {
-      $ssh_config_defaults = {
-        'unix_user' => $name,
-        'require'   => File["${home}/.ssh"],
+      ssh::client::config::user { $name:
+        user_home_dir       => $home,
+        manage_user_ssh_dir => false,
+        options             => $ssh_config,
+        require             => File["${home}/.ssh"],
       }
-      create_resources(sshuserconfig::remotehost, $ssh_config, $ssh_config_defaults)
     } else {
       file { "${home}/.ssh/config": ensure => 'absent' }
     }
