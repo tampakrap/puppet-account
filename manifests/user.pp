@@ -107,9 +107,7 @@ define account::user (
       include gnupg
 
       $gpg_keys_defaults = {
-        'ensure'     => 'present',
         'user'       => $name,
-        'key_source' => 'hkp://keys.gnupg.net/',
         'key_type'   => 'public',
         'require'    => File[$home],
       }
