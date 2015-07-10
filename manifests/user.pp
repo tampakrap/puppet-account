@@ -7,7 +7,6 @@
 #  - ~/.ssh/config through sshuserconfig::remotehost
 #  - ~/.git/config through git::config (puppetlabs/git)
 #  - ~/.gnupg through through gnupg_key (golja/gnupg)
-#  - ~/.forward
 #
 define account::user (
   $ensure              = 'absent',
@@ -24,7 +23,6 @@ define account::user (
   $ssh_config          = {},
   $git_config          = {},
   $gpg_keys            = {},
-  $forward             = undef,
 ) {
   validate_re($ensure, ['present', 'absent'])
   validate_hash($ssh_authorized_keys)
@@ -51,18 +49,6 @@ define account::user (
       group   => $gid,
       mode    => '0600',
       require => User[$name],
-    }
-
-    if $forward {
-      file { "/home/${name}/.forward":
-        content => "# managed by puppet\n\n${forward}\n",
-        owner   => $name,
-        group   => $gid,
-        mode    => '0644',
-        require => User[$name],
-      }
-    } else {
-      file { "/home/${name}/.forward": ensure => 'absent' }
     }
 
     if $ssh_authorized_keys {
