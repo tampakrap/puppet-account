@@ -22,18 +22,17 @@ class account (
   $users           = {},
   $users_defaults  = {},
 ) {
-  if $groups {
-    validate_hash($groups)
-    if $groups_defaults { validate_hash($groups_defaults) }
+  validate_hash($groups)
+  validate_hash($groups_defaults)
+  validate_hash($users)
+  validate_hash($users_defaults)
 
+  if $groups {
     $_groups = hiera_hash('account::groups')
     create_resources(group, $_groups, $groups_defaults)
   }
 
   if $users {
-    validate_hash($users)
-    if $users_defaults { validate_hash($users_defaults) }
-
     $_users = hiera_hash('account::users')
     create_resources(account::user, $_users, $users_defaults)
   }

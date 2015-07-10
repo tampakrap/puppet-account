@@ -1,0 +1,9 @@
+fixtures:
+  forge_modules:
+    git: "puppetlabs/git"
+    gnupg: "golja/gnupg"
+    ssh: "saz/ssh"
+    ssh_keygen: "maestrodev/ssh_keygen"
+    stdlib: "puppetlabs/stdlib"
+  symlinks:
+    account: "#{source_dir}"
