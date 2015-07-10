@@ -5,6 +5,7 @@
 #  - ~/.ssh/authorized_keys through ssh_authorized_keys resource
 #  - ~/.ssh/known_hosts through sshkey resource
 #  - ~/.ssh/config through ssh::client::config::user (saz/ssh)
+#  - private and public ssh key pair through ssh_keygen (maestrodev/ssh_keygen)
 #  - ~/.git/config through git::config (puppetlabs/git)
 #  - ~/.gnupg through through gnupg_key (golja/gnupg)
 #
@@ -22,6 +23,7 @@ define account::user (
   $ssh_authorized_keys = {},
   $ssh_known_hosts     = {},
   $ssh_config          = {},
+  $ssh_keys            = {},
   $git_config          = {},
   $gpg_keys            = {},
   $home_mode           = '0755',
@@ -34,6 +36,7 @@ define account::user (
   validate_hash($ssh_authorized_keys)
   validate_hash($ssh_known_hosts)
   validate_hash($ssh_config)
+  validate_hash($ssh_keys)
   validate_hash($git_config)
   validate_hash($gpg_keys)
 
@@ -92,6 +95,15 @@ define account::user (
       }
     } else {
       file { "${home}/.ssh/config": ensure => 'absent' }
+    }
+
+    if ! empty($ssh_keys) {
+      $ssh_keys_defaults = {
+        'home'    => $home,
+        'user'    => $title,
+        'require' => File["${home}/.ssh"],
+      }
+      create_resources(ssh_keygen, $ssh_keys, $ssh_keys_defaults)
     }
 
     if ! empty($git_config) {
