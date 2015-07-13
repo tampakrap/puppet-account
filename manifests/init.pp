@@ -27,12 +27,12 @@ class account (
   validate_hash($users)
   validate_hash($users_defaults)
 
-  if $groups {
+  if ! empty($groups) {
     $_groups = hiera_hash('account::groups')
     create_resources(group, $_groups, $groups_defaults)
   }
 
-  if $users {
+  if ! empty($users) {
     $_users = hiera_hash('account::users')
     create_resources(account::user, $_users, $users_defaults)
   }
