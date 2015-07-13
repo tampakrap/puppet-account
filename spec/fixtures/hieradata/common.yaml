@@ -8,8 +8,10 @@ account::groups:
     system: false
 account::users:
   myuser:
+    ensure: 'present'
     uid: '50'
     system: true
   myotheruser:
+    ensure: 'present'
     uid: '200'
     system: false

@@ -10,7 +10,7 @@
 #  - ~/.gnupg through through gnupg_key (golja/gnupg)
 #
 define account::user (
-  $ensure              = 'absent',
+  $ensure              = 'unmanaged',
   $groups              = [],
   $managehome          = true,
   $purge_ssh_keys      = true,
@@ -28,7 +28,7 @@ define account::user (
   $gpg_keys            = {},
   $home_mode           = '0755',
 ) {
-  validate_re($ensure, ['present', 'absent'])
+  validate_re($ensure, ['present', 'absent', 'unmanaged'])
   validate_array($groups)
   validate_bool($managehome)
   validate_bool($purge_ssh_keys)
@@ -40,17 +40,19 @@ define account::user (
   validate_hash($git_config)
   validate_hash($gpg_keys)
 
-  user { $name:
-    ensure         => $ensure,
-    uid            => $uid,
-    gid            => $gid,
-    groups         => $groups,
-    home           => $home,
-    managehome     => $managehome,
-    password       => $password,
-    purge_ssh_keys => $purge_ssh_keys,
-    system         => $system,
-    shell          => $shell,
+  if $ensure != 'unmanaged' {
+    user { $name:
+      ensure         => $ensure,
+      uid            => $uid,
+      gid            => $gid,
+      groups         => $groups,
+      home           => $home,
+      managehome     => $managehome,
+      password       => $password,
+      purge_ssh_keys => $purge_ssh_keys,
+      system         => $system,
+      shell          => $shell,
+    }
   }
 
   if $ensure == 'present' and $managehome {

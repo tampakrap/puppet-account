@@ -11,11 +11,45 @@ describe 'account::user' do
   end
 
   context 'when using defaults' do
-    it { should contain_user(title).with_ensure('absent') }
+    it { should_not contain_user(title) }
     it { should_not contain_file("/home/#{title}") }
     it { should_not contain_file("/home/#{title}/.ssh") }
     it { should_not contain_file("/home/#{title}/.ssh/config") }
     it { should_not contain_file("/home/#{title}/.gitconfig") }
+  end
+
+  context 'when specifying ensure unmanaged' do
+    [true, false].each do |managehome|
+      let(:params) do
+        {
+          :ensure     => 'unmanaged',
+          :managehome => managehome,
+        }
+      end
+
+      it { should_not contain_user(title) }
+      it { should_not contain_file("/home/#{title}") }
+      it { should_not contain_file("/home/#{title}/.ssh") }
+      it { should_not contain_file("/home/#{title}/.ssh/config") }
+      it { should_not contain_file("/home/#{title}/.gitconfig") }
+    end
+  end
+
+  context 'when specifying ensure absent' do
+    [true, false].each do |managehome|
+      let(:params) do
+        {
+          :ensure     => 'absent',
+          :managehome => managehome,
+        }
+      end
+
+      it { should contain_user(title).with_ensure('absent') }
+      it { should_not contain_file("/home/#{title}") }
+      it { should_not contain_file("/home/#{title}/.ssh") }
+      it { should_not contain_file("/home/#{title}/.ssh/config") }
+      it { should_not contain_file("/home/#{title}/.gitconfig") }
+    end
   end
 
   describe 'when specifying ensure present' do
