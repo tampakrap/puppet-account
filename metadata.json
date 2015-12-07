@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "author": ["Theo Chatzimichos"],
   "license": "Apache-2.0",
-  "summary": "TODO",
+  "summary": "Handle groups and users along with their dotfiles",
   "source": "https://github.com/tampakrap/puppet-account",
   "project_page": "https://github.com/tampakrap/puppet-account",
   "issues_url": "https://github.com/tampakrap/puppet-account/issues",
