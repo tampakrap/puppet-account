@@ -20,6 +20,7 @@ define account::user (
   $uid                 = undef,
   $gid                 = undef,
   $password            = undef,
+  $allowdupe           = false,
   $ssh_authorized_keys = {},
   $ssh_known_hosts     = {},
   $ssh_config          = {},
@@ -33,6 +34,7 @@ define account::user (
   validate_bool($managehome)
   validate_bool($purge_ssh_keys)
   validate_bool($system)
+  validate_bool($allowdupe)
   validate_hash($ssh_authorized_keys)
   validate_hash($ssh_known_hosts)
   validate_hash($ssh_config)
@@ -52,6 +54,7 @@ define account::user (
       purge_ssh_keys => $purge_ssh_keys,
       system         => $system,
       shell          => $shell,
+      allowdupe      => $allowdupe,
     }
   }
 
