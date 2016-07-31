@@ -8,4 +8,4 @@ script: bundle exec rake test
 env:
   - PUPPET_VERSION="~> 3.6.2"
   - PUPPET_VERSION="~> 3.7.5"
-  - PUPPET_VERSION="~> 3.8.4"
+  - PUPPET_VERSION="~> 3.8.7"
