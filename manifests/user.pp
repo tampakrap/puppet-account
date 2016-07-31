@@ -27,7 +27,7 @@ define account::user (
   $ssh_keys            = {},
   $git_config          = {},
   $gpg_keys            = {},
-  $home_mode           = '0755',
+  $home_mode           = undef,
 ) {
   validate_re($ensure, ['present', 'absent', 'unmanaged'])
   validate_array($groups)

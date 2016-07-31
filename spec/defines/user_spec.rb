@@ -97,7 +97,6 @@ describe 'account::user' do
         :ensure => 'directory',
         :owner  => title,
         :group  => '100',
-        :mode   => '0755',
       ).that_requires("User[#{title}]") end
 
       it do should contain_file("/home/#{title}/.ssh").with(
