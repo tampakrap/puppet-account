@@ -1,7 +1,7 @@
 {
   "name": "tampakrap-account",
   "version": "0.1.0",
-  "author": ["Theo Chatzimichos"],
+  "author": "Theo Chatzimichos",
   "license": "Apache-2.0",
   "summary": "Handle groups and users along with their dotfiles",
   "source": "https://github.com/tampakrap/puppet-account",
