@@ -28,12 +28,12 @@ class account (
   validate_hash($users_defaults)
 
   if ! empty($groups) {
-    $_groups = hiera_hash('account::groups',$groups)
+    $_groups = lookup('account::groups', Hash, {'strategy' => 'deep', knockout_prefix => '--'}, $groups)
     create_resources(group, $_groups, $groups_defaults)
   }
 
   if ! empty($users) {
-    $_users = hiera_hash('account::users',$users)
+    $_users = lookup('account::users', Hash, {'strategy' => 'deep', knockout_prefix => '--'}, $users)
     create_resources(account::user, $_users, $users_defaults)
   }
 }

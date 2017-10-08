@@ -1,7 +1,7 @@
 {
   "name": "tampakrap-account",
   "version": "0.1.0",
-  "author": ["Theo Chatzimichos"],
+  "author": "Theo Chatzimichos",
   "license": "Apache-2.0",
   "summary": "Handle groups and users along with their dotfiles",
   "source": "https://github.com/tampakrap/puppet-account",
@@ -36,29 +36,29 @@
   "dependencies": [
     {
       "name": "golja/gnupg",
-      "version_range": ">=1.2.1 <2.0.0"
+      "version_requirement": ">=1.2.1 <2.0.0"
     },
     {
       "name": "puppetlabs/git",
-      "version_range": ">=0.4.0 <1.0.0"
+      "version_requirement": ">=0.4.0 <1.0.0"
     },
     {
       "name": "puppetlabs/stdlib",
-      "version_range": ">=4.6.0 <5.0.0"
+      "version_requirement": ">=4.6.0 <5.0.0"
     },
     {
       "name": "maestrodev/ssh_keygen",
-      "version_range": ">=1.2.0 <2.0.0"
+      "version_requirement": ">=1.2.0 <2.0.0"
     },
     {
       "name": "saz/ssh",
-      "version_range": ">=2.8.1 <3.0.0"
+      "version_requirement": ">=2.8.1 <3.0.0"
     }
   ],
   "requirements": [
     {
       "name": "puppet",
-      "version_range": ">=3.7.0 <4.0.0"
+      "version_requirement": ">=3.7.0 <4.0.0"
     }
   ]
 }
